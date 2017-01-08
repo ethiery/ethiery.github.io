@@ -124,34 +124,34 @@ for i in range(int(input())):
     dictionary.add(input())
  
 def possibleLetters(index):
- &#39;&#39;&#39; returns a list of pair (letter, length of the corresponding morse code) containing
- all the letters it is possible to read in msg at index&#39;&#39;&#39;
- global abc, msg
- return [(abc[morse], len(morse)) for morse in abc.keys() if msg.startswith(morse, index)]
+    &#39;&#39;&#39; returns a list of pair (letter, length of the corresponding morse code) containing
+    all the letters it is possible to read in msg at index&#39;&#39;&#39;
+    global abc, msg
+    return [(abc[morse], len(morse)) for morse in abc.keys() if msg.startswith(morse, index)]
  
 def nbMsg(index, decodedYet):
- global msg, dictionary, MAX_WORD_LENGTH
- # if the size of decodedYet exceeds the maximum length of a word,
- # then the previous decyphering does not lead to a correct msg, returns 0
- res = 0
- if index in decodedYet.mem:
- return decodedYet.mem[index]
- else:
- if index == len(msg) and decodedYet.word:
- res = 1
- else:
- nextLetters = possibleLetters(index)
- # nb of msg possible if we continue to read
- for l, offset in nextLetters:
- if l in decodedYet.sons:
- res += nbMsg(index+offset, decodedYet.sons[l])
+    global msg, dictionary, MAX_WORD_LENGTH
+    # if the size of decodedYet exceeds the maximum length of a word,
+    # then the previous decyphering does not lead to a correct msg, returns 0
+    res = 0
+    if index in decodedYet.mem:
+        return decodedYet.mem[index]
+    else:
+        if index == len(msg) and decodedYet.word:
+            res = 1
+        else:
+            nextLetters = possibleLetters(index)
+            # nb of msg possible if we continue to read
+            for l, offset in nextLetters:
+                if l in decodedYet.sons:
+                    res += nbMsg(index+offset, decodedYet.sons[l])
  
- if decodedYet.word:
- # nb of msg if we move to next word
- res += nbMsg(index, dictionary.root) 
+            if decodedYet.word:
+                # nb of msg if we move to next word
+                res += nbMsg(index, dictionary.root) 
  
- decodedYet.memoize(index, res)
- return res
+        decodedYet.memoize(index, res)
+        return res
 
 print(nbMsg(0, dictionary.root))
             </pre>
