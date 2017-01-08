@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="4 better than 1 : a headache generator for hardcore tryharders">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>Brainsplit: a headache generator for hardcore tryharders</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- game script -->
+    <script src='fonctions.js' type="text/javascript"></script>
+
+</head>
+
+<body id="page-top" onselectstart="return false"  oncontextmenu="return false">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="#game">The game</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="#about">About</a>
+                    </li>		      
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <audio id="consigne1">
+        <source src="Consigne1.mp3" type="audio/mp3">
+        Votre navigateur ne supporte pas les éléments audio
+    </audio>
+
+    <audio id="consigne2">
+        <source src="Consigne2.mp3" type="audio/mp3">
+        Votre navigateur ne supporte pas les éléments audio
+    </audio>
+
+    <audio id="consigne3">
+    <source src="Consigne3.mp3" type="audio/mp3">
+        Votre navigateur ne supporte pas les éléments audio
+    </audio>
+
+    <audio id="consigne4">
+        <source src="Consigne4.mp3" type="audio/mp3">
+        Votre navigateur ne supporte pas les éléments audio
+    </audio>
+
+    <section id="game" class="bg-secondary">
+        <div class="container text-center">
+            <h2>Four better than one : how long will you handle this ?</h2>
+            <hr>
+            <h4 id="instructions"> </h4>        
+        </div>
+
+        <canvas id="dessin" width="800" height="600">
+                Votre navigateur ne supporte pas les fonctionnalités nécessaires au lancement du jeu, veuillez le mettre à jour
+        </canvas>
+        
+    </section>
+
+    <section id="about">
+        <div class="container">
+            <div class="row">
+                <div class="col-xs-12">
+                    <h2 class="section-heading text-center">About this game</h2>
+                    <hr>
+                </div>
+                <div class="col-xs-12">           
+                    <p> During my second year of studies at INSA Toulouse, I followed an optional web programming course. It covered the basics of HTML5, CSS3, Javascript and Jquery. To put into pratice what I had just learned, I tried and developped this simple game.</p>
+                    <p> It has a very simple design and the code is probably outdated. But I was quite happy with it at the time, and I still find it funny to play. It is actually very challenging (at least for me) after 60 seconds, when all the four minigames are running !</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>
