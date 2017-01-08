@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Shadows of the knight 2 - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Shadows of the knight 2 - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./the-resistance.html">Previous</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Shadows of the knight 2</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to find bombs in a grid in a few steps, only knowing if you are getting closer or further away at each step.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import sys, math
+
+w,h = [int(i) for i in input().split()]
+input() # number of turns before game over is useless
+x0,y0 = [int(i) for i in input().split()]
+
+# x0 y0 will be used to store the previous position
+# and x y the current position
+x,y = x0,y0
+
+# xs*ys is the area where the bomb could be
+# we&#39;ll first narrow down the area to a column by dichotomy on xaxis
+# then to a single windows by dichotomy on yaxis
+xs, ys = range(w), range(h)
+
+
+def narrow(x0,y0,x,y,xs,ys,info):
+ print(&quot;narrow : x0={}, y0={}, x={}, y={}, info={}&quot;.format(x0,y0,x,y,info), file=sys.stderr)
+ # xaxis dichotomy
+ if len(xs) != 1:
+ if info == &quot;UNKNOWN&quot;:
+ pass
+ elif info == &quot;SAME&quot;:
+ xs = [i for i in xs if abs(x0-i) == abs(x-i)]
+ elif info == &quot;WARMER&quot;:
+ xs = [i for i in xs if abs(x0-i) &gt; abs(x-i)]
+ else:
+ xs = [i for i in xs if abs(x0-i) &lt; abs(x-i)]
+ #yaxis dichotomy
+ else:
+ if info == &quot;UNKNOWN&quot;:
+ pass
+ elif info == &quot;SAME&quot;:
+ ys = [i for i in ys if abs(y0-i) == abs(y-i)]
+ elif info == &quot;WARMER&quot;:
+ ys = [i for i in ys if abs(y0-i) &gt; abs(y-i)]
+ else:
+ ys = [i for i in ys if abs(y0-i) &lt; abs(y-i)]
+ print(xs, file=sys.stderr)
+ print(ys, file=sys.stderr)
+ return xs,ys
+
+
+
+while 1:
+ info = input()
+ # uses infos to narrow the area where the bomb could be
+ xs,ys = narrow(x0,y0,x,y,xs,ys,info)
+ # chooses the new location so that it allows to split the area in half next turn
+ x0,y0 = x,y
+ # dichotomy along x axis
+ if len(xs) != 1:
+ # the bisection between x0 and x should cut the area in 2 so:
+ # (x + x0)/2 = (xs[0] + xs[-1])/2
+ # little trick
+ if (x0 == 0 and len(xs) != w):
+ x = (3*xs[0] + xs[-1])//2 - x0
+ elif (x0 == w-1 and len(xs) != w):
+ x = (xs[0] + 3*xs[-1])//2 - x0
+ else:
+ x = xs[0] + xs[-1] - x0
+ # to avoid fixed points
+ if x == x0:
+ x+=1
+ x = min(max(x, 0), w-1)
+ 
+ else:
+ # transition to second dichotomy
+ if x != xs[0]:
+ x = x0 = xs[0]
+ print(x, y)
+ info = input()
+ # finishing
+ if len(ys) == 1:
+ y = ys[0]
+ # dichotomy along y axis
+ else:
+ if (y0 == 0 and len(ys) != h):
+ y = (3*ys[0] + ys[-1])//2 - y0
+ elif (y0 == h-1 and len(ys) != h):
+ y = (ys[0] + 3*ys[-1])//2 - y0
+ else:
+ y = ys[0] + ys[-1] - y0
+ y = min(max(y, 0), h-1)
+ print(x, y)
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>
