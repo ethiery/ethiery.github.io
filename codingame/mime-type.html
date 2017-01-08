@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - MIME type - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - MIME type - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right"> 
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./ascii-art.html">Previous</a>
+                    </li>             
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./defibrillators.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">MIME type</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+          <p>The aim of this puzzle is to match files with their MIME type by reading their extensions. It involves without naming it a peculiar data structure : dictionaries. Let us see a simple implementation in C, and how to use standards in Java and Python.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+// Represents an association between an extension, and its mime type
+struct pair { char *ext; char *mime; };
+
+// A dictionnary can be implented very simply as a pair array
+struct dict {
+    int size;
+    struct pair *elmts;
+};
+
+/* Returns the MIME type of label 'ext' in dictionnary 'dict'
+   or &quot;UNKNOWN&quot; if there is no matching extension */
+char *assoc (struct dict *d, char *ext) {
+    for (int i = 0; i &lt; d-&gt;size; i++)
+        if (strcmp(d-&gt;elmts[i].ext, ext) == 0)
+            return d-&gt;elmts[i].mime;
+    return &quot;UNKNOWN&quot;;
+}
+
+// Replaces all uppercase chars of 'str' by the corresponding lowercase chars
+void toLower (char *str) {
+    for (; *str != '\0'; str++)
+        *str = tolower(*str);
+}
+
+// Returns a pointer on the first char of the extension of 'str' if it has one
+// or NULL else
+char *getExt (char *str) {
+    for (char *ext = str+strlen(str); ext != str; ext--)
+        if (*(ext-1) == '.')
+            return ext;
+    return NULL;
+}
+
+int main(int argc, char** argv)
+{
+    int dictSize, nbFiles;
+    scanf(&quot;%d\n%d\n&quot;, &amp;dictSize, &amp;nbFiles);
+
+    // Initializes the dictionary extension-MIME type
+    struct dict d;
+    struct pair *p;
+    d.size = dictSize;
+    d.elmts = malloc(d.size*sizeof(struct pair));
+    for (int i = 0; i &lt; dictSize; i++) {
+        p = d.elmts+i;
+        p-&gt;ext = malloc(11*sizeof(char));
+        p-&gt;mime = malloc(51*sizeof(char));
+        // here using scanf is quite safe because maximal lengths are known
+        scanf(&quot;%s %s\n&quot;, p-&gt;ext, p-&gt;mime);
+        toLower(p-&gt;ext);
+    }
+
+    // processes file 1 by 1, by isolating ext and matching it with a MIME type
+    char file[257];
+    char *ext;
+    for (int i = 0; i &lt; nbFiles; i++) {
+        gets(file);
+        toLower(file);
+        ext = getExt(file);
+        printf(&quot;%s\n&quot;, assoc(&amp;d, ext?ext:&quot;&quot;));
+    }
+
+    for (int i = 0; i &lt; dictSize; i++) {
+        p = d.elmts+i;
+        free(p-&gt;ext);
+        free(p-&gt;mime);
+    }
+    free(d.elmts);
+
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+
+class Solution {
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+
+        int nbAssociations = in.nextInt();
+        int nbFiles = in.nextInt();
+        in.nextLine();
+        
+        // assoc associates to each file extension the corresponding MIME type
+        Map assoc = new HashMap();
+        for (int i = 0; i &lt; nbAssociations; i++) {
+            assoc.put(in.next().toLowerCase(), in.next());
+            in.nextLine();
+        }
+
+        for (int i = 0; i &lt; nbFiles; i++) {
+            // isolates the extension, which is the part after the last . 
+            String fileName = in.nextLine().toLowerCase();
+            int pos = fileName.lastIndexOf('.');
+            String extension = (pos == -1) ? &quot;&quot; : fileName.substring(pos+1, fileName.length());
+            // prints the corresponding MIME type, or UNKNOWN
+            System.out.println((String)(assoc.getOrDefault(extension, &quot;UNKNOWN&quot;)));
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python 3</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import sys
+
+nbAssociations, nbFiles = int(input()), int(input())
+
+# assoc associates to each file extension the corresponding MIME type
+assoc = {}
+for i in range(nbAssociations):
+    ext, mime = input().split()
+    assoc[ext.lower()] = mime
+
+for i in range(nbFiles):
+    name = input().lower().split('.') 
+    ext = name[-1] if len(name) != 1 else None
+    print(assoc[ext] if ext in assoc else &quot;UNKNOWN&quot;)
+            </pre>
+        </div>
+
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+        <a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+       </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

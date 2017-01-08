@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Bender, the money machine - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Bender, the money machine - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./genome-sequencing.html">Previous</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./bender-algorithmic-complexity.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Bender, the money machine</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to help Bender collect the maximum amount of money in a building before getting out. Each room contains a given amount, and opens to 2 other rooms (or outside). You can pass only one time in each room, but do not have to check if you do so, because the building does not contains cycles. This is a very classic graph problem, searching the longest path in a directed weighted graph, in a special case that makes it easy to solve (positive weights, and acylic). A possible model is to consider rooms as vertices, and connect each room r with the two rooms it opens to, by an edge of weight the amount of money in r. Then you just have to use a queue to explore all vertices starting from room 0, updating the maximum amount of money that can be pocketted on the way to each room.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+
+class Solution {
+
+    private static int nbRooms;
+    private static Room[] rooms;
+
+    /** This class represents a room, which is characterized by 
+     * unique id in [0, nbRooms-1], the sum of money in the room 
+     * and the ids of the 2 next rooms (nbRoom for an exit) */
+    class Room {
+        int id;
+        int sum;
+        int[] next; 
+        
+        /** Initializes a new room with the 4 fields of line*/
+        public Room(String line) {
+            String[] fields = line.split(&quot; &quot;);
+            id = Integer.parseInt(fields[0]);
+            sum = Integer.parseInt(fields[1]);
+            next = new int[2];
+            next[0] = (fields[2].equals(&quot;E&quot;)) ? nbRooms : Integer.parseInt(fields[2]);
+            next[1] = (fields[3].equals(&quot;E&quot;)) ? nbRooms : Integer.parseInt(fields[3]);
+        }
+    }
+
+    public static void main(String args[]) {
+
+        // Reads input and initializes the array of rooms
+        Scanner in = new Scanner(System.in);        
+        nbRooms = in.nextInt();
+        in.nextLine();
+        rooms = new Room[nbRooms];
+        for (int i = 0; i &lt; nbRooms; i++)
+            rooms[i] = new Room(in.nextLine());
+
+        /* The array money contains the amount of money pocketted on the
+           &quot;best&quot; path found yet (index nbRooms correspond to a virtual exit room)
+           It is initially filled with zeros*/
+        int money[] = new int[nbRooms+1];
+
+        // Searches the building, updating money when finding a better path
+        LinkedList&lt;Room&gt; q = new LinkedList&lt;Room&gt;();
+        q.add(rooms[0]);
+        while (q.size() &gt; 0) {
+            Room r = q.remove();
+            for (int n : r.next)
+                if (money[r.id] + r.sum &gt; money[n]) {
+                    money[n] = money[r.id] + r.sum;
+                    if (n &lt; nbRooms)
+                        q.add(rooms[n]);
+                }
+        }
+
+        /* At this point, money[nbRooms] is the maximum amount of money pocketted 
+        on a path to the exit.*/
+        System.out.println(money[nbRooms]);
+    }
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

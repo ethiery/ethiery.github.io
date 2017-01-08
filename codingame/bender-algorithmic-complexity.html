@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Bender, Algorithmic Complexity - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Bender, Algorithmic Complexity - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- Mathjax for latex rendering -->
+    <script type="text/javascript"src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./bender-the-money-machine.html">Previous</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Bender, Algorithmic Complexity</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to match a scatterplot with one of a few complexity functions. As these functions have a \(x \mapsto x^{\alpha} \beta^x \log{x} \) form, one of the most complete solution would be to use the <a href="https://en.wikipedia.org/wiki/Least_squares">method of least squares</a>. But for this puzzle, you can settle for a lighter method, for example computing the scatterplots corresponding to the complexity functions, and find a formula to assess their likelihood to the original scatterplot.<br>Note that the \(\Theta (n^3)\) validation test can be tricky to pass with this method, as the data set is a \(\Theta(n^{2.8})\) which is closer to a \(\Theta (n^2 \log{n})\) on the interval studied. A hack around this is to add the \(\Theta(n^{2.5})\) complexity function, and output \(\Theta (n^3)\) when it is recognized.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import math
+
+# name, and function of the main complexities
+names = [&quot;1&quot;,&quot;log n&quot;,&quot;n&quot;,&quot;n log n&quot;, &quot;n^2&quot;, &quot;n^2 log n&quot;, &quot;n^3&quot;, &quot;2^n&quot;]
+complexities = [lambda x: 1, 
+                lambda x: math.log(x), 
+                lambda x: x, 
+                lambda x: x*math.log(x), 
+                lambda x: x**2, 
+                lambda x: x**2*math.log(x),
+                lambda x: x**3, 
+                lambda x: math.pow(2,x)]
+# maximum value which can be fed to the corresponding complexity function
+# without overflow
+upperLimit = [None, None, None, None, None, None, None, 500]
+
+# Read input, storing data volumes in x, and execution times in perf
+x, perf = [], []
+for i in range(int(input())):
+    a, b = [int(j) for j in input().split()]
+    x.append(a)
+    perf.append(b)
+
+# for each complexity function f, computes a normalized variance of the ratio (perf/f)
+# It it is not representative (variance over less than 5 values) stores -1 instead
+# Then updates minVariance and result so that minVariance stays the minimal 
+# representative variance found yet, and result is the number of the corresponding 
+# function, which is the most probable complexity function found yet
+variances, minVariance, result = [], sys.maxsize, -1
+
+for i in range(len(complexities)):
+    f = complexities[i]
+    # takes upperLimit into account to avoid an overflow
+    maxDataVolume = len(x)
+    if upperLimit[i] != None:
+        for j in range(len(x)):
+            if x[j] &gt; upperLimit[i]:
+                maxDataVolume = j-1
+                break
+            
+    ratio = [ perf[j]/f(x[j]) for j in range(maxDataVolume)]
+    if (len(ratio) &lt; 5):
+        variances.append(-1)
+    else:
+        mean = sum(ratio) / len(ratio)
+        variances.append(sum([(val-mean)**2 for val in ratio]) / mean**2)
+        if (variances[-1] &lt; minVariance):
+            minVariance = variances[-1]
+            result = i
+
+print(&quot;O({})&quot;.format(names[result]))
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

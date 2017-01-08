@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Stock Exchange Losses - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Stock Exchange Losses- solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./indiana1.html">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./network-cabling.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Stock Exchange Losses</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>Easy puzzle, you have a list of values and are looking for the biggest loss possible, i.e the biggest difference between a high value, and a low value which follows it in the list. For this you just have to compute the difference between the current value and the maximum value read yet, and search for the biggest difference.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <p>Note the usage of strtok and atoi to read all the integer values contained in a string.</p>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;limits.h&gt;
+
+int main(int argc, char **argv)
+{
+    // number of stock values
+    int N;
+    scanf(&quot;%d\n&quot;, &amp;N);
+    
+    /* as each stock value is under 2^31 which is roughly 4*10^9,
+       15 chars per value is largely enough*/
+    char line[15*N];
+    fgets(line,15*N,stdin);
+    
+    /* currentMax and currentMin will store the local minimum and maximum
+       stock values, maxLoss will store the maximum loss found yet */
+    int stockValue, maxLoss, currentMax, currentMin;
+    maxLoss = currentMax = 0;
+    currentMin = INT_MAX;
+    
+    // Uses strtok to read all the stock values
+    char *tok;
+    tok = strtok(line,&quot; &quot;);
+    for (int i = 0 ; i &lt; N ; i++) {
+        stockValue = atoi(tok);
+        
+        if (stockValue &gt; currentMax) {
+            if (currentMax-currentMin &gt; maxLoss)
+                maxLoss = currentMax-currentMin;
+            currentMax = currentMin = stockValue;
+        } 
+        else if (stockValue &lt; currentMin)
+            currentMin = stockValue;
+            
+        tok = strtok(NULL,&quot; &quot;);
+    }
+    
+    if (currentMax-currentMin &gt; maxLoss)
+        maxLoss = currentMax-currentMin;
+        
+    printf(&quot;%d\n&quot;,-maxLoss);
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Bender, a depressed robot - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Bender, a depressed robot - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./dwarfs-on-giants.html">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./scrabble.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Bender, a depressed robot</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is, given a map, the starting position of Bender the robot and the effect on him of the items found on the map, to compute the moves he will do. It does not involve any interesting algorithm, only a lot of switch statements to handle all cases.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <p>I prefered allocating the 2-dimensionnal array (the map) dynamically, because it makes it easier to pass them to functions.</p>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+struct Coords {
+    int X;
+    int Y;
+};
+
+// gathered the variables in a struct to simplify code
+struct Infos {
+    struct Coords c;
+    // order in which bender tries the 4 directions, point on norder or rorder
+    char* order;
+    // 1 if bender is in breaker mode, 0 else
+    int breaker;
+    // S, E, W or N
+    char direction;
+    struct Coords teleporters[2];
+};
+
+char norder[4] = { 'S', 'E', 'N', 'W' };
+char rorder[4] = { 'W', 'N', 'E', 'S' };
+
+// array representing the sequence of moves taken by Bender
+int nbMoves = 0;
+char* moves[200];
+
+// Returns the coordinates of the next Tile bender will move on to
+struct Coords nextTile (struct Infos *bender){
+    struct Coords res = { bender-&gt;c.X , bender-&gt;c.Y };
+    switch (bender-&gt;direction) {
+        case 'S':
+            res.Y++; break;
+        case 'W':
+            res.X--; break;
+        case 'E':
+            res.X++; break;
+        case 'N':
+            res.Y--; break;
+    }
+    return res;
+}
+
+// Makes bender move on, update variables according to what is found on next tile
+void go (struct Infos *bender, char** map){
+    switch (bender-&gt;direction) {
+        case 'N':
+            moves[nbMoves] = &quot;NORTH\n&quot;;
+            bender-&gt;c.Y--;
+            break;
+        case 'S':
+            moves[nbMoves] = &quot;SOUTH\n&quot;;
+            bender-&gt;c.Y++;
+            break;
+        case 'E':
+            moves[nbMoves] = &quot;EAST\n&quot;;
+            bender-&gt;c.X++;
+            break;
+        case 'W':
+            moves[nbMoves] = &quot;WEST\n&quot;;
+            bender-&gt;c.X--;
+            break;
+    }
+    nbMoves++;
+    switch (map[bender-&gt;c.Y][bender-&gt;c.X]) {
+        case 'X':
+            map[bender-&gt;c.Y][bender-&gt;c.X] = ' ';
+            break;
+        case 'B':
+            bender-&gt;breaker = !bender-&gt;breaker;
+            break;
+        case 'I':
+            bender-&gt;order = (bender-&gt;order == norder)?rorder:norder;
+            break;
+        case 'S':
+        case 'N':
+        case 'E':
+        case 'W':
+            bender-&gt;direction = map[bender-&gt;c.Y][bender-&gt;c.X];
+            break;
+        case 'T':
+            teleport(bender);
+            break;
+    }
+}
+
+// computes the direction Bender will take according to order, breaker mode, etc
+void changeDirection (struct Infos *bender, char** map){
+    int i = 0;
+    struct Coords t = nextTile(bender);
+    while (map[t.Y][t.X] == '#' || (!bender-&gt;breaker &amp;&amp; map[t.Y][t.X] == 'X')) {
+            bender-&gt;direction = bender-&gt;order[i++];
+            t = nextTile(bender);
+    }
+}
+
+// teleports Bender from the teleporter it is on to the other
+void teleport (struct Infos *bender){
+    if (bender-&gt;c.X == bender-&gt;teleporters[0].X &amp;&amp; 
+        bender-&gt;c.Y == bender-&gt;teleporters[0].Y) 
+    {
+        bender-&gt;c.X = bender-&gt;teleporters[1].X;
+        bender-&gt;c.Y = bender-&gt;teleporters[1].Y;
+    }
+    else {
+        bender-&gt;c.X = bender-&gt;teleporters[0].X;
+        bender-&gt;c.Y = bender-&gt;teleporters[0].Y;
+    }
+}
+
+int main(int argc, char **argv)
+{
+    struct Infos bender;
+ 
+    // Read input   
+    int L, C;
+    scanf(&quot;%d %d\n&quot;, &amp;L, &amp;C);
+    char** map = malloc(L*sizeof(char*));
+    int telep = 0;
+    for (int i = 0; i &lt; L; i++) {
+        map[i] = malloc((C+1)*sizeof(char));
+        gets(map[i]);
+        for (int j = 0; j &lt; C; j++) {
+            if (map[i][j] == '@') {
+                bender.c.X = j;
+                bender.c.Y = i;
+            }
+            if (map[i][j] == 'T') {
+                bender.teleporters[telep].X = j;
+                bender.teleporters[telep++].Y = i;
+            }
+        }
+    }
+    
+    bender.order = norder;
+    bender.breaker = 0;
+    bender.direction = 'S';
+
+    while (map[bender.c.Y][bender.c.X] != '$' &amp;&amp; nbMoves &lt; 200) {
+        struct Coords t = nextTile(&amp;bender);
+        switch(map[t.Y][t.X]) {
+            case ' ':
+            case '$':
+            case 'E':
+            case 'W':
+            case 'S':
+            case 'N':
+            case 'B':
+            case 'I':
+            case 'T':
+                go(&amp;bender, map);
+                break;
+            case '#':
+            case 'X':
+                changeDirection(&amp;bender, map);
+                go(&amp;bender, map);
+                break;       
+        }
+    }
+    
+    if (nbMoves == 200)
+        printf(&quot;LOOP\n&quot;);
+    else
+        for (int i = 0; i &lt; nbMoves ; i++)
+            printf(moves[i]);
+
+    // frees memory
+    for (int i = 0; i &lt; L; i++)
+        free(map[i]);
+    free(map);
+
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

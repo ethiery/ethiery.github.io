@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Winamax Sponsored Challenge - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Winamax Sponsored Challenge - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./mars-lander-2">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./heat-detector.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Winamax Sponsored Challenge</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to simulate games of War, given two initial decks. It is a good start to develop a function to compare the value of 2 cards. Once you have it, it is basically a lot of control flow statemens to handle wars, and the possible outcomes of a round. My solution gives a simple example of error management in Python.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python3</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+# Game configuration : the differents cards possible and their value
+# We would only need to modify this dictionnary if the order of the 
+# card changed, or if we wanted to play with a 32 card game for example
+values = {'2D':2, '2H':2, '2C':2, '2S':2, 
+          '3D':3, '3H':3, '3C':3, '3S':3,
+          '4D':4, '4H':4, '4C':4, '4S':4, 
+          '5D':5, '5H':5, '5C':5, '5S':5,
+          '6D':6, '6H':6, '6C':6, '6S':6,
+          '7D':7, '7H':7, '7C':7, '7S':7,
+          '8D':8, '8H':8, '8C':8, '8S':8, 
+          '9D':9, '9H':9, '9C':9, '9S':9,
+          '10D':10, '10H':10, '10C':10, '10S':10, 
+          'JD':11, 'JH':11, 'JC':11, 'JS':11,
+          'QD':12, 'QH':12, 'QC':12, 'QS':12, 
+          'KD':13, 'KH':13, 'KC':13, 'KS':13,
+          'AD':14, 'AH':14, 'AC':14, 'AS':14}
+    
+def compare(c1, c2):
+    ''' returns : 
+    - 0 if card1 and card 2 have equal values
+    - 1 if card1 wins over card2
+    - 1 if card2 wins over card1'''
+    global values
+
+    if values[c1] &lt; values[c2]:
+        return -1
+    elif values[c1] &gt; values[c2]:
+        return 1
+    else:
+        return 0
+
+
+# Reads input to initialize decks
+deck1, deck2 = [], []
+for i in range(int(input())):
+    deck1.append(input())
+for i in range(int(input())):
+    deck2.append(input())
+
+nbRounds = 0
+
+while True:
+    # Each loop is one game round
+    # pile1 and pile2 are the cards played this turn by player 1 and 2
+
+    try:    
+        pile1, pile2 = [deck1.pop(0)], [deck2.pop(0)]
+    except IndexError:
+        # this error means one of the two decks is empty
+        winner = '1' if len(deck1) &gt; 0 else '2'
+        print(winner, nbRounds)
+        break
+
+    nbRounds+=1
+    
+    # In case of war(s)
+    try:
+        # While there is a war, each player plays 3 other cards
+        while compare(pile1[-1], pile2[-1]) == 0:
+            for i in range(4):
+                pile1.append(deck1.pop(0))
+                pile2.append(deck2.pop(0))
+    except IndexError:
+        # an index error means one of the two decks got empty
+        # during a war, and both players are equally first
+        print('PAT')
+        break
+
+    # Moves the 2 piles to the round winner's deck bottom
+    if compare(pile1[-1], pile2[-1]) == -1:
+        deck2 = deck2 + pile1 + pile2
+    else:
+        deck1 = deck1 + pile1 + pile2
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

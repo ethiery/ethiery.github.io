@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Defibrillators- solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Defibrillators- solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right"> 
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./mime-type.html">Previous</a>
+                    </li>             
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./horse-racing-duals.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Defibrillators</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+          <p>The aim of this puzzle is to find the closest defibrillators in a list. The main difficulty is that for each defibrillator of the list are given not only coordinates, but also a lot of useless information. That is why this puzzle involves a lot of string manipulation.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;math.h&gt;
+#include &lt;float.h&gt;
+
+// represents a defibrillator
+struct defib { char* name; double lon; double lat; };
+
+/* Returns the distance between a point A and a point B 
+   given their lat(itude) and lon(gitude)*/
+double distance(double longA, double latA, double longB, double latB){
+    double x = (longB-longA)*cos((latA+latB)/2);
+    double y = latB - latA;
+    return (sqrt(x*x+y*y) * 6371.0);
+}
+
+// Parses a double in string 'str' using atof, and replacing , by . if needed
+double toDouble(char *str) {
+    for(char *iter = str; *iter != '\0'; iter++)
+        if (*iter == ',')
+            *iter = '.';
+    return atof(str);
+}
+
+// Returns a pointer on next char 'c' in 'str'
+char *goToNext(char c, char *str) {
+    for(; *str != c; str++);
+    return str;
+}
+
+/* Reads the line 'str', and stores relevant fields in 'defib'
+   pretty awful implementation, but necessary for speed*/
+void getDefib(char *str, struct defib *res) {
+    str = goToNext(';', str);
+    res-&gt;name = ++str;
+    for (int k = 0; k &lt; 3; k++) {
+        str = goToNext(';', str);
+        *str = '\0';
+        str++;
+    }
+    char *lon = str;
+    str = goToNext(',', str);
+    *str = '.';
+    str = goToNext(';', str);
+    char *lat = ++str;
+    str = goToNext(',', str);
+    *str = '.';
+    res-&gt;lon = atof(lon);
+    res-&gt;lat = atof(lat);
+}
+
+int main(int argc, char** argv)
+{
+    char strLon[50];
+    char strLat[50];
+    int N;
+    scanf(&quot;%s\n%s\n%d\n&quot;, strLon, strLat, &amp;N);
+    double lon = toDouble(strLon);
+    double lat = toDouble(strLat);
+    
+    // simple linear search amongst defibrillators
+    double min = DBL_MAX;
+    char output[100];
+    double d;
+    char line[256];
+    struct defib res;
+
+    for (int i = 0; i &lt; N; i++) {
+        getDefib(fgets(line, 256, stdin), &amp;res);
+        d = distance(lon, lat, res.lon, res.lat);
+        if (d &lt; min) {
+            min = d;
+            strcpy(output, res.name);
+        }
+    }
+    printf(&quot;%s&quot;, output);
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.math.*;
+
+class Solution {
+    /** Returns the distance between a point A and a point B
+     * @param longA longitude of point A
+     * @param latA latitude of point A
+     * @param longB longitude of point B
+     * @param latB latitude of point B
+     * @return distance between A and B
+     */
+    private static double distance(double longA, double latA, double longB, double latB){
+        double x = (longB-longA)*Math.cos((latA+latB)/2);
+        double y = latB - latA;
+        return Math.sqrt(Math.pow(x,2) + Math.pow(y,2)) * 6371;
+    }
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        
+        /* as the latitude and the longitude are given with , instead of .
+           it isn't possible to use nextFloat()*/
+        Double lon = new Double(in.next().replace(',', '.'));
+        Double lat = new Double(in.next().replace(',', '.'));
+        int N = in.nextInt();
+        in.nextLine();
+
+        // simple min search amongst defibrillators
+        double min = Double.POSITIVE_INFINITY;
+        String res = &quot;&quot;;
+        Double d;
+        for (int i = 0; i &lt; N; i++) {
+            String[] defib = in.nextLine().replace(',', '.').split(&quot;;&quot;);
+            d = distance(lon, lat, new Double(defib[4]), new Double(defib[5]));
+            if (d &lt; min) {
+                min = d;
+                res = defib[1];
+            }
+        }
+        System.out.println(res);
+    }
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python 3</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import math
+
+def distance (longA, latA, longB, latB):
+    ''' return the distance between point A and point B 
+    given their latitude and longitude '''
+    x = (longB-longA)*math.cos((latA+latB)/2)
+    y = latB-latA
+    return 6371 * math.sqrt(x*x+y*y)
+
+lon, lat, N = float(input().replace(&quot;,&quot;, &quot;.&quot;)), float(input().replace(&quot;,&quot;, &quot;.&quot;)), int(input())
+# linear search amongst defibrillators
+min, res = None, None
+for i in range(N):
+    defib = input().replace(&quot;,&quot;, &quot;.&quot;).split(&quot;;&quot;)
+    d = distance(lon, lat, float(defib[4]), float(defib[5]))
+    if (min == None) or (d &lt; min):
+        min, res = d, defib[1]
+print(res)
+            </pre>
+        </div>
+
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+        <a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+       </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

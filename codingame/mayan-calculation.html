@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Mayan Calculation - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Mayan Calculation - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./the-gift.html">Previous</a>
+                    </li>     
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Mayan Calculation</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to perform operations between mayan numbers. It involves a lot of string manipulation to convert mayan numbers to decimal numbers, and to convert the result to a mayan number.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <p>Once more, I prefered allocating 2-dimensionnal arrays dynamically, because it makes it easier to pass them to functions.</p>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+/* digit is a 2-dim array of size H x W representing 1 of the 20 mayan digits.
+   digits is a 2-dim array of size H x 20*W representing the 20 mayan digits.
+   This function compares 'digit' with each of the 20 digits and returns
+   the matching decimal value.*/
+int mayanDigitToInt(char** digit, char** digits, int W, int H) {
+    int isIdentical = 0;
+    int i = 0;
+    while (i &lt; 20 &amp;&amp; !isIdentical) {
+        /* we assum 'digit' to be the i-th digit of 'digits' and look
+           for a difference to refute this hypothesis*/ 
+        isIdentical = 1;
+        for (int y = 0; y &lt; H &amp;&amp; isIdentical; y++)
+            for (int x = 0; x &lt; W &amp;&amp; isIdentical; x++)
+                if (digits[y][i*W + x] != digit[y][x]) {
+                    isIdentical = 0;
+                    i++;
+                }
+    }
+    return i;
+}
+
+/* number is a 2-dim array of size numberH x &gt; representing a mayan number
+   digits is a 2-dim array of size H x 20*W representing the 20 mayan digits.
+   This functions converts number into its decimal value*/
+long mayanNumberToLong(char** number, int numberH, char** digits, int W, int H) {
+    long result = 0;
+    for (int i = 0; i &lt; numberH/H; i++)
+        result += mayanDigitToInt(number + i*H, digits, W, H) * pow(20, numberH/H - (i+1));
+    return result;
+}
+
+/* digits is a 2-dim array of size H x 20*W representing the 20 mayan digits.
+   This function converts 'digit' into its mayan representation and prints it.*/
+void printAsMayanDigit(int digit, char** digits, int W, int H) {
+    for (int y = 0; y &lt; H; y ++) {
+        fwrite(&amp;digits[y][digit*W], W, sizeof(char), stdout);
+        printf(&quot;\n&quot;);
+    }
+}
+
+/* digits is a 2-dim array of size H x 20*W representing the 20 mayan digits.
+   This function prints the mayan representation of 'number' recursively, 
+   using printAsMayanDigit*/
+void printAsMayanNumber(long number, char** digits, int W, int H) {
+    if(number != 0) {
+        printAsMayanNumber(number/20, digits, W, H);
+        printAsMayanDigit(number%20, digits, W, H);
+    }
+}
+
+// Frees a dynamically allocated 2-dimensionnal array of dimension dim1 xsmthing
+void free2DArray(char **array, int dim1) {
+    for (int i = 0; i &lt; dim1; i++)
+        free(array[i]);
+    free(array);
+}
+
+int main(int argc, char **argv)
+{
+    int W, H;
+    scanf(&quot;%d %d\n&quot;, &amp;W, &amp;H);
+
+    // reads the 20 mayan digits
+    char** digits = malloc(H * sizeof(*digits));
+    for (int i = 0; i &lt; H; i++) {
+        digits[i] = malloc(20 * W * sizeof(**digits));
+        gets(digits[i]);
+    }
+    
+    // read first mayan number
+    int nb1H;
+    scanf(&quot;%d\n&quot;, &amp;nb1H);
+    char **nb1 = malloc(nb1H * sizeof(*nb1));
+    for (int i = 0; i &lt; nb1H; i++) {
+        nb1[i] = malloc(W * sizeof(**nb1));
+        gets(nb1[i]);
+    }
+    long decimalNb1 = mayanNumberToLong(nb1, nb1H, digits, W, H);
+    
+    
+    // reads second mayan number
+    int nb2H;
+    scanf(&quot;%d\n&quot;, &amp;nb2H);
+    char **nb2 = malloc(nb2H * sizeof(*nb2));
+    for (int i = 0; i &lt; nb2H; i++) {
+        nb2[i] = malloc(W * sizeof(**nb2));
+        gets(nb2[i]);
+    }
+    long decimalNb2 = mayanNumberToLong(nb2, nb2H, digits, W, H);
+    
+    // reads the operation to perform
+    char operation;
+    scanf(&quot;%c\n&quot;, &amp;operation);
+    
+    // performs operation
+    long result = 0;
+    switch(operation) {
+        case '*':
+            result = decimalNb1 * decimalNb2; break;
+        case '/':
+            result = decimalNb1 / decimalNb2; break;
+        case '+':
+            result = decimalNb1 + decimalNb2; break;
+        case '-':
+            result = decimalNb1 - decimalNb2; break;
+    }
+    
+    // prints result
+    if (result == 0)
+        printAsMayanDigit(0, digits, W, H);
+    else
+        printAsMayanNumber(result, digits, W, H);
+
+    // frees memory
+    free2DArray(digits, H);
+    free2DArray(nb1, nb1H);
+    free2DArray(nb2, nb2H);
+
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

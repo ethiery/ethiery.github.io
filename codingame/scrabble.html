@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Scrabble - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Scrabble - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./bender.html">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./the-gift.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Scrabble</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to find the best word possible (in a given dictionnary) with a given set of letters. By best, understand the word that earn the most points when playing Scrabble. Once developped a function which determine if it is possible to write a word with a set of letters, and another function which computes the number of points earned by a word, a simple linear search allows to find the result. If not easier, this puzzle is as difficult as the easy puzzles involving string manipulation and linear search.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+// Returns 1 if 'word' is writeable with letters contains in 'letters', 0 else
+int writeable(char* word, char* letters) {
+    char copy[strlen(letters)];
+    strcpy(copy, letters);
+    
+    /* For each letter in word, looks for the letter in copy and replaces it
+       by a space. If the letter can't be found, then word is not writeable with
+       letters */
+    for (int i = 0; word[i] != '\0'; i++) {
+        int j = 0;
+        while (copy[j] != '\0' &amp;&amp; copy[j] != word[i])
+            j++;
+        if (copy[j] == word[i])
+            copy[j] = ' ';
+        else
+            return 0;
+    }
+    return 1;
+}
+
+// array of 26 integers corresponding to the weight of each letter of the alphabet
+int WEIGHTS[] = {1,3,3,2,1,4,2,4,1,8,5,1,3,1,1,3,10,1,1,1,1,4,4,8,4,10};
+
+// Returns the number of points 'word' earns
+int pointCount (char *word, int WEIGHTS[26]) {
+    int res = 0;
+    for (int i = 0; word[i] != '\0'; i++)
+        res += WEIGHTS[word[i]-'a'];
+    return res;
+}
+
+int main(int argc, char **argv)
+{
+    // Reading input : the N words of the dictionary, and letters available
+    int N;
+    scanf(&quot;%d\n&quot;, &amp;N);
+    char dictionary[N][30];
+    for (int i = 0; i &lt; N; i++)
+        gets(dictionary[i]);
+    char letters[8];
+    fgets(letters,8,stdin);
+    
+    // Searches max pointCount amongst writeable words
+    int max = 0;
+    int count;
+    char *res = NULL;
+    for (int i = 0; i &lt; N; i++)
+        if (writeable(dictionary[i], letters) &amp;&amp; (count = pointCount(dictionary[i], WEIGHTS)) &gt; max) {
+            max = count;
+            res = dictionary[i];
+        }
+
+    printf(&quot;%s\n&quot;, res);
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

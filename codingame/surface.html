@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Surface - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Surface - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./tan-network.html">Previous</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./super-computer.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Surface</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>Very simple puzzle if you know what a flooding algorithm is. The aim of this puzzle is to measure the surface area of lakes, drawn on a char grid by characters 'O'. An area can be obtained very easily by counting the number of cells flooded.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.io.*;
+import java.math.*;
+
+class Solution {
+
+    /** width, height of the map and the map*/
+    static private int width;
+    static private int height;
+    static private char[][] map;
+
+    /** Class representing a couple of cartesian coordinates*/
+    static class Coords {
+        int X, Y;
+    
+        public Coords(int X, int Y){
+            this.X = X;
+            this.Y = Y;
+        }
+    
+        /** returns an array containing the 4 adjacent coordinates to this */
+        public Coords[] neighbours() {
+            Coords res[] = {new Coords(X, Y-1), new Coords(X+1, Y), new Coords(X, Y+1), new Coords(X-1, Y)};
+            return res;
+        }
+
+        /** returns true if and only if the coordinates are in the boundaries of the map*/
+        public boolean isInMap() {
+            return 0 &lt;= X &amp;&amp; X &lt; width &amp;&amp; 0 &lt;= Y &amp;&amp; Y &lt; height;
+        }
+    }
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        
+        // Reads the map
+        width = in.nextInt();
+        height = in.nextInt();
+        in.nextLine();
+        map = new char[height][width];
+        for (int y = 0; y &lt; height; y++)
+            map[y] = in.nextLine().toCharArray();
+
+        int N = in.nextInt();
+        for (int i = 0; i &lt; N; i++) {
+            int X = in.nextInt();
+            int Y = in.nextInt();
+        
+            // copies the map    
+            char[][] copy = new char[height][width];
+            for (int y = 0; y &lt; height; y++)
+                for (int x = 0; x &lt; width; x++)
+                    copy[y][x] = map[y][x];
+
+            // floods the map starting from (X,Y), 
+            // counting the number of cells flooded, which is the area of the lake
+            LinkedList&lt;Coords&gt; queue = new LinkedList&lt;Coords&gt;();
+            int count = 0;
+            if (copy[Y][X] == 'O') {
+                copy[Y][X] = '#';
+                count++;
+                queue.add(new Coords(X, Y));
+            }
+
+            while (queue.size() &gt; 0) {
+                Coords c = queue.remove();
+                for (Coords neighbour : c.neighbours()) {
+                    if (neighbour.isInMap() &amp;&amp; copy[neighbour.Y][neighbour.X] == 'O') {
+                        copy[neighbour.Y][neighbour.X] = '#';
+                        count++;
+                        queue.add(neighbour);
+                    }
+                } 
+            }
+            System.out.println(count);
+        }
+    }
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - TAN Network - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - TAN Network - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./skynet-the-bridge.html">Previous</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./surface.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">TAN Network</h2>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to find the shortest path from one stop to another in a bus network. It is a classic problem of pathfinding in a graph. I have only one tip : be careful, the latitudes and longitudes are given in degrees, but the distance formula in the statement uses gradians. It can be the reason why your solution passes the test cases, but not the validation tests. I used Dijkstra algorithm, which runs in o(nbOfStops) for pathfinding, but there are many other pathfinding algorithm (amongst which the famous A star).</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.io.*;
+import java.math.*;
+
+/** This class represents a TAN stop. It is characterized by :
+ * &lt;ul&gt;
+ * &lt;li&gt;A unique constant identifier&lt;/li&gt;
+ * &lt;li&gt;Its full name&lt;/li&gt;
+ * &lt;li&gt;A latitude and a longitude giving his position&lt;/li&gt;
+ * &lt;li&gt;The list of stops accessible from this stop&lt;/li&gt;
+ * &lt;li&gt;A unique number, which can be used as an identifier too&lt;/li&gt;
+ * &lt;/ul&gt;
+ */
+class Stop {
+    private String id;
+    private String name;
+    private double latitude;
+    private double longitude;
+    private ArrayList&lt;Stop&gt; accessibleStops;
+    private int number; 
+    
+    /** Initializes a new stop with informations given by the inputLine*/
+    public Stop(String inputLine, int nb) {
+        String fields[] = inputLine.split(&quot;,&quot;, -1);
+        id = fields[0];
+        name = fields[1].substring(1, fields[1].length()-1);
+        latitude = Math.toRadians(new Double(fields[3]));
+        longitude = Math.toRadians(new Double(fields[4]));
+        accessibleStops = new ArrayList&lt;Stop&gt;();
+        number = nb;
+    }
+
+    /** Only setter, adding an accessible stop the list*/
+    public void addAccessibleStop(Stop s) {
+        accessibleStops.add(s);
+    }
+
+    // Getters
+    public String id() {
+        return id;
+    }
+
+    public String name() {
+        return name;
+    }
+
+    public double lat() {
+        return latitude;
+    }
+
+    public double lon() {
+        return longitude;
+    }
+
+    public ArrayList&lt;Stop&gt; accessibleStops() {
+        return accessibleStops;
+    }
+
+    public int nb() {
+        return number;
+    }
+}
+
+class Solution {
+
+    /** Looks for a stop of id 'id' in 'stops' and returns it.
+     * if it can't be found, return null
+     */
+    static private Stop getStop(String id) {
+        for (Stop s : stops)
+            if (s.id().equals(id))
+                return s;
+        return null;
+    }
+
+
+    /** Returns the distance between stop A and stop B*/
+    private static double distance(Stop A, Stop B) {
+        double x = (B.lon()-A.lon())*Math.cos((A.lat()+A.lat())/2);
+        double y = B.lat() - A.lat();
+        return Math.sqrt(Math.pow(x,2) + Math.pow(y,2)) * 6371;
+    }
+    
+    /** Returns one of the shortest Path from stop 'from' to stop 'to'
+     * or null if there is no path.
+     */
+    private static Stack&lt;Stop&gt; shortestPath(Stop from, Stop to) {
+        // arrays of predecessors, and distance from 'from'
+        Stop pred[] = new Stop[stops.length];
+        double dist[] = new double[stops.length];
+        for (int i = 0; i &lt; stops.length; i++) {
+            pred[i] = null;
+            dist[i] = Double.MAX_VALUE;
+        }
+        dist[from.nb()] = 0.0;
+        pred[from.nb()] = from;
+        
+        ArrayList&lt;Stop&gt; notExplored = new ArrayList(Arrays.asList(stops));
+
+        while (notExplored.size() &gt; 0) {
+            // amongst the non explored stops, find the one with smallest dist
+            Stop chosen = null;
+            double min = Double.MAX_VALUE;
+            for (Stop s : notExplored)
+                if (dist[s.nb()] &lt; min) {
+                    min = dist[s.nb()];
+                    chosen = s;
+                }
+                
+            // if chosen stays null, then remaining stops are not accessible
+            // from 'from
+            if (chosen == null)
+                notExplored.clear();
+            else {
+                // update distance of neighbours of the chosen stop
+                notExplored.remove(chosen);   
+                for (Stop neighbour : chosen.accessibleStops()) {
+                    double d = distance(chosen, neighbour);
+                    if (dist[neighbour.nb()] &gt; dist[chosen.nb()] + d) {
+                        dist[neighbour.nb()] = dist[chosen.nb()] + d;
+                        pred[neighbour.nb()] = chosen;
+                    }
+                }
+            }
+        }
+
+        // if the predecessor of 'to' is still null, then 'to' is not 
+        // accessible from 'from
+        if (pred[to.nb()] == null)
+            return null;
+        else {
+            // retraces path by reading pred, and returns it
+            Stack&lt;Stop&gt; path = new Stack&lt;Stop&gt;();
+            Stop iter = to;
+            while (iter != from) {
+                path.push(iter);
+                iter = pred[iter.nb()];
+            }
+            path.push(from);
+            return path;
+        }
+    }
+
+    /** array containing all the stops of the network*/
+    private static Stop stops[];
+    
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        
+        String startPoint = in.nextLine();
+        String endPoint = in.nextLine();
+        
+        int nbStops = in.nextInt();
+        in.nextLine();
+        stops = new Stop[nbStops];
+        for (int i = 0; i &lt; nbStops; i++)
+            stops[i] = new Stop(in.nextLine(), i);
+
+        int nbRoutes = in.nextInt();
+        in.nextLine();
+        for (int i = 0; i &lt; nbRoutes; i++) {
+            String route[] = in.nextLine().split(&quot; &quot;);
+            getStop(route[0]).addAccessibleStop(getStop(route[1]));
+        }
+
+        // computes shortest path, if it exists prints it, else prints IMPOSSIBLE
+        Stack&lt;Stop&gt; path = shortestPath(getStop(startPoint), getStop(endPoint)); 
+        if (path == null)
+            System.out.println(&quot;IMPOSSIBLE&quot;);
+        else
+            while (!path.empty())
+                System.out.println(path.pop().name());
+    }
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

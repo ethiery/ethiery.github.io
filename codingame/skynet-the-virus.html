@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Skynet, the Virus - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Skynet, the Virus - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./apu-init-phase.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Skynet, the Virus</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+          <p> In this puzzle, Skynet Agent is trying to escape from a graph by travelling from node to node until the closest exit node. The aim is to prevent it from doing so, by removing edges of the graph. As each node can only be connected to one exit node, a solution is to find each turn one of the shortest paths to exit and cut it.
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+
+/** 
+* &lt;b&gt; Node is the class representing a node of the network. &lt;/b&gt; Each node as :
+* &lt;ul&gt;
+* &lt;li&gt; a unique id, constant
+* &lt;li&gt; a list of neighbour nodes
+* &lt;/ul&gt;
+*/
+class Node {
+    private final int n;
+    private LinkedList&lt;Node&gt; neighb;
+    
+    public Node(int n) {
+        this.n = n;
+        neighb = new LinkedList&lt;Node&gt;();
+    }
+    
+    public void addNeighb(Node m) {
+        neighb.add(m);
+    }
+    
+    public void removeNeighb(Node m) {
+        neighb.remove(m);
+    }
+    
+    public Node[] neighb() {
+        return neighb.toArray(new Node[neighb.size()]);
+    }
+    
+    public int n() {
+        return n;
+    }
+}
+
+/**
+ * &lt;b&gt; Path is the class representing a path in the network, by a list of nodes &lt;/b&gt;
+ */
+class Path {
+    private LinkedList&lt;Node&gt; p;
+    
+    public Node getNode(int i) {
+        return p.get(i);
+    }
+
+    public int length() {
+        return p.size();
+    }
+    
+    public void addFirst(Node n) {
+        p.addFirst(n);
+    }
+
+    public Path() {
+        p = new LinkedList&lt;Node&gt;();
+    }
+    
+    /** This constructor builds a shortest path in the network described by 
+     * nodes, between begin and end 
+     */
+    public Path (Node begin, Node end, Node[] nodes) {
+        p = new LinkedList&lt;Node&gt;();
+        int N = nodes.length;
+        
+        /* For each node is kept a boolean equal to true if it has been visited
+        and an int equal to the node it has been visited from (initially = -1) */
+        boolean[] explored = new boolean[N];
+        for (int i=0; i &lt; N ;i++) 
+            explored[i] = false;
+        explored[begin.n()] = true;
+        
+        int[] prec = new int[N];
+        for (int i=0; i &lt; N; i++) 
+            prec[i] = -1;
+        
+
+        /* A BFS is performed, starting from node begin
+        and until finding the node end.*/       
+        LinkedList&lt;Node&gt; q = new LinkedList&lt;Node&gt;();
+        q.add(begin);
+        Node n = null;
+        
+        while((q.size() != 0) &amp;&amp; (n = q.remove()) != end) {
+            for (Node m : n.neighb()) {
+                if(!explored[m.n()]) {
+                    explored[m.n()] = true;
+                    prec[m.n()] = n.n();
+                    q.add(m);
+                }
+            }
+        }
+        
+        /* if the queue is empty before finding the node end then 
+        there is no path, the new path stays empty.
+        Else, a shortest path is identified by backtracing.*/
+        if (n == end) {
+            while(n != begin) {
+                this.addFirst(n);
+                n = nodes[prec[n.n()]];
+            }
+            this.addFirst(n);
+        }
+    } 
+}
+
+
+class Player {
+
+    public static void cut(Node n1, Node n2){
+        n1.removeNeighb(n2);
+        n2.removeNeighb(n1);
+        System.out.println(n1.n() + &quot; &quot; + n2.n());
+    }
+
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        // Scanning number of nodes, links, and exits
+        int N = in.nextInt();
+        int L = in.nextInt();
+        int E = in.nextInt();
+        // Initializing an array of non-linked nodes
+        Node[] nodes = new Node[N];
+        for (int i = 0 ; i &lt; N ; i++) 
+            nodes[i] = new Node(i);
+        // Linking nodes
+        for (int i = 0; i &lt; L; i++) {
+            int N1 = in.nextInt();
+            int N2 = in.nextInt();
+            nodes[N1].addNeighb(nodes[N2]);
+            nodes[N2].addNeighb(nodes[N1]);
+        }
+        // Initializing an array of exit nodes
+        Node[] exits = new Node[E];
+        for (int i = 0; i &lt; E; i++)
+            exits[i] = nodes[in.nextInt()];
+
+        while (true) {
+            // Skynet agent position
+            int SI = in.nextInt(); 
+
+            /* Simple strategy : identify one shortest paths from Skynet
+               agent to each exit node, thanks to a Breadth First Searches
+               Then cutting the shortest, as close as possible to Skynet agent */
+            Path[] shortestPaths = new Path[E];
+            int minLength = Integer.MAX_VALUE;
+            Path pathToCut = null;
+
+            for (int i = 0 ; i &lt; E ; i++) {
+                shortestPaths[i] = new Path(nodes[SI], exits[i], nodes);
+                int length = shortestPaths[i].length();
+                if ((length != 0) &amp;&amp; (length &lt; minLength)) {
+                    minLength = length;
+                    pathToCut = shortestPaths[i];
+                }
+            }
+            
+            cut(pathToCut.getNode(0), pathToCut.getNode(1)); 
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python</h2>
+            <div class="divider-grey"></div>
+            <p>This code implements the same algorithm as in Java. It is a good example of OOP in Python.</p>
+            <pre class="prettyprint linenums">
+import sys, math
+
+class Node(object):
+    '''Class representing a node of the network, each node as :
+    a unique id, constant
+    a list of neighbour nodes'''
+    def __init__(self, n =0):
+        self.n = n
+        self.neighb = []
+    
+    def addNeighb(self, m):
+        self.neighb.append(m)
+        
+    def removeNeighb(self, m):
+        self.neighb.remove(m)
+        
+class Path(object):
+    '''class representing a path in the network, by a list of node'''
+    def __init__(self, begin, end, nodes):
+        '''This constructor builds a shortest path in the network described by 
+        nodes, between begin and end'''
+        self.p = []
+        N = len(nodes)
+        
+        # explored[i] is True &lt;=&gt; node i has been visited
+        # prec[i] = j &lt;=&gt; node i has been visited coming from node j
+        explored, prec = [], []
+        for i in range(N):
+            explored.append(False)
+            prec.append(-1)
+        explored[begin.n] = True
+        
+        # A BFS is performed starting from node begin, until finding node end
+        q, n = [], None
+        q.append(begin)
+        while len(q) != 0:
+            n = q.pop()
+            if n == end:
+                break
+            else:
+                for m in n.neighb:
+                    if not explored[m.n]:
+                        explored[m.n] = True
+                        prec[m.n] = n
+                        q[0:0] = [m]
+        # if the queue is empty before finding end, there is no path
+        # else a shortest path is identified by backtracking
+        if n == end:
+            while n != begin:
+                self.p[0:0] = [n]
+                n = prec[n.n]
+            self.p[0:0] = [n]
+            
+    def length(self):
+        return len(self.p)
+    
+    def addFirst(self, n):
+        self.p[0:0] = [n]
+        
+    def getNode(self, i):
+        return self.p[i]
+
+def cut(n1, n2):
+    '''removes the edge between node n1 and n2'''
+    n1.removeNeighb(n2)
+    n2.removeNeighb(n1)
+    print(&quot;{} {}&quot;.format(n1.n, n2.n))
+
+# number of nodes, links and exits
+N, L, E = [int(i) for i in input().split()]
+
+# initializing the array of nodes and linking them
+nodes = []
+for i in range(N):
+    nodes.append(Node(i))
+for i in range(L):
+    N1, N2 = [int(j) for j in input().split()]
+    nodes[N1].addNeighb(nodes[N2])
+    nodes[N2].addNeighb(nodes[N1])
+
+# initializing the array of exits
+exits = []    
+for i in range(E):
+    exits.append(nodes[int(input())])
+
+while 1:
+    # each turn, identifies one of the shortest paths from Skynet Agent
+    # to each exit node (by a Breadth First Search), then cuts the shortest
+    SI = int(input())
+    shortestPaths = []
+    minLength = 9999999
+    pathToCut = None
+    
+    for i in range(E):
+        shortestPaths.append(Path(nodes[SI], exits[i], nodes))
+        length = shortestPaths[i].length()
+        if (length != 0) and (length &lt; minLength):
+            minLength = length
+            pathToCut = shortestPaths[i]
+    
+    cut(pathToCut.getNode(0), pathToCut.getNode(1))
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

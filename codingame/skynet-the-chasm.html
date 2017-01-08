@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Skynet : the Chasm - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Skynet : the Chasm - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right"> 
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./power-of-thor.html">Previous</a>
+                    </li>             
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./mars-lander-1.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Skynet : the Chasm</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+          <p> This puzzle is a simplified version of the hard puzzle "Skynet : the bridge". The aim is to drive a motorbike to make it jump over a gap at the right speed and time. Validation tests are specific cases, that can be passed by implementing the algorithm given in the problem statement. Accelerate until you have enough speed to cross the gap, keep that speed until its time to jump and brake after the gap.
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+
+int main(int argc, char** argv)
+{
+    int before, gap, after;
+    scanf(&quot;%d%d%d\n&quot;, &amp;before, &amp;gap, &amp;after);
+ 
+    for (;;) {
+        // x = motorbike abscissa ; dx = motorbike speed
+        int dx, x;
+        scanf(&quot;%d%d&quot;, &amp;dx, &amp;x);
+        
+        // if the bike has passed the gap, or going faster than needed to jump over it
+        if (x &gt;= before+gap || dx &gt; gap+1)
+            printf(&quot;SLOW\n&quot;);
+        // if the bike isn't going fast enough to jump over the gap
+        else if (dx &lt;= gap)
+            printf(&quot;SPEED\n&quot;);
+        // if the bike can land after the gap by jumping
+        else if (x+dx &gt;= before+gap)
+            printf(&quot;JUMP\n&quot;);
+        else
+            printf(&quot;WAIT\n&quot;);
+    }
+
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+
+class Player {
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        int before = in.nextInt();
+        int gap = in.nextInt();
+        int after = in.nextInt();
+
+        while (true) {
+            // x = motorbike abscissa ; dx = motorbike speed
+            int dx = in.nextInt();
+            int x = in.nextInt();
+
+            // if the bike isn't going fast enough to jump over the gap
+            if ((x &gt;= before + gap) || (dx &gt; gap + 1))
+                System.out.println(&quot;SLOW&quot;);
+            // if the bike is going slower than needed : speed
+            else if (dx &lt;= gap)
+                System.out.println(&quot;SPEED&quot;);
+            // if the bike can land after the gap : jump
+            else if (x + dx &gt;= before + gap)
+                System.out.println(&quot;JUMP&quot;);
+            else
+                System.out.println(&quot;WAIT&quot;);
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python 3</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+before, gap, after = int(input()), int(input()), int(input())
+
+while 1:
+    # x = motorbike abscissa ; dx = motorbike speed
+    dx, x = int(input()), int(input())
+    
+    # if the bike is after the gap, or going faster than needed : slow
+    if (x &gt;= before + gap) or (dx &gt; gap+1):
+        print(&quot;SLOW&quot;)
+    # if the bike isn't going fast enough to jump over the gap
+    elif (dx &lt;= gap):
+        print(&quot;SPEED&quot;)
+    #  if the bike can land after the gap by jumping
+    elif (x+dx &gt;= before+gap):
+        print(&quot;JUMP&quot;)
+    else:
+        print(&quot;WAIT&quot;)
+            </pre>
+        </div>
+
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+        <a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+       </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

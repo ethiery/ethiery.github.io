@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Chuck Norris - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Chuck Norris - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right"> 
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./temperatures.html">Previous</a>
+                    </li>             
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./ascii-art.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Chuck Norris</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+          <p> This puzzle takes difficulty (or at least complexity) up a notch in languages without automatic memory management. The aim is to convert a string into unary code (blocks of zeros). First each character must be converted into its binary ascii code, then in unary. 
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <p> I did not find any standard function useful to convert a character to its binary ascii code, so I wrote my own function to do it. This code is a good example of how to read through strings using pointers arithmetic. It also shows how to return a string using dynamic allocation (malloc) and a pointer</p>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+// Converts character 'c' to its binary code on 7 bits
+char *toBinCode (char c) {
+    char *res = malloc(8*sizeof(char));
+    for (int i = 6; i &gt;= 0; i--) {
+        res[i] = '0'+(c%2);
+        c/=2;
+    }
+    res[7] = '\0';
+    return res;
+}
+
+int main(int argc, char** argv)
+{
+    // note that fgets keeps the \n at the end of the msg
+    char msg[100];
+    fgets(&amp;msg,100,stdin);
+    char binMsg[700];
+
+    /* Iterating over msg and binMsg using pointers iter, binIter 
+       converting each char in their binary code
+       which is appended at the end of binMsg */
+    char* iter = msg;
+    char* binIter = binMsg;
+    char *code; 
+    while (*iter != '\n') {
+        code = toBinCode(*iter);
+        strncpy(binIter, code, 7);
+        free(code);
+        iter++;
+        binIter+=7;
+    }
+    *binIter = '\0';
+
+    /* prev contains the last character of binMsg read : '0' or '1'
+       count countains the number of consecutive identical characters */    
+    char prev = '2';
+    int count = 0;
+    /* reads binMsg character by character, updating prev, count
+       and printing the solution gradually*/
+    for (binIter = binMsg; *binIter != '\0'; binIter++) {
+        if (*binIter != prev) {
+            for (int j = 0; j &lt; count; j++) 
+                printf(&quot;0&quot;);
+            if (count != 0) 
+                printf(&quot; &quot;);
+            printf((*binIter == '0') ? &quot;00 &quot; : &quot;0 &quot;);
+            count = 1;
+        } else
+            count++;
+        prev = *binIter;
+    }
+    for (int j = 0 ; j &lt; count ; j++) 
+        printf(&quot;0&quot;);     
+
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <p>For this puzzle I used Java StringBuilder, which allows to join differents strings without storing a new string in memory at each concatenation</p>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.math.*;
+
+class Solution {
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        String msg = in.nextLine();
+ 
+        StringBuilder binMsg = new StringBuilder(&quot;&quot;);
+        
+        /* Converts the message into its binary code, char by char 
+        (without forgetting 0s in the beginning like toBinaryString does)*/
+        for (char c : msg.toCharArray()) {
+            String binChar = Integer.toBinaryString(c);
+            for (int j = binChar.length(); j &lt; 7 ;j++)
+                binMsg.append(&quot;0&quot;);
+            binMsg.append(binChar);
+        }
+        
+        /* prev contains the last character of binMsg read : '0' or '1'
+           count cointains the number of consecutive identical characters */    
+        char prev = '2';
+        int count = 0;
+        /* reads binMsg character by character, updating prev, count
+           and printing the solution bit by bit*/
+        for (char c :  binMsg.toString().toCharArray()) {
+            if (c != prev) {
+                for (int j = 0 ; j &lt; count ; j++) 
+                    System.out.print(&quot;0&quot;);
+                if (count != 0) 
+                    System.out.print(&quot; &quot;);
+                System.out.print((c == '0') ? &quot;00 &quot; : &quot;0 &quot;);
+                count = 1;
+            } else {
+                count++;
+            }
+            prev = c;
+        }
+        for (int j = 0 ; j &lt; count ; j++) 
+            System.out.print(&quot;0&quot;);         
+    }
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python 3</h2>
+            <div class="divider-grey"></div>
+            <p> String multiplication in Python as particularly handy for this puzzle where the string "0" is printed a lot. Python's advanced formatting function allows to convert easily a character into its binary ascii code.</p>
+            <pre class="prettyprint linenums">
+msg = input()
+binMsg = []
+for c in msg:
+    # converts c to a 7digit 0 left padded binary code
+    binMsg.append('{0:07b}'.format(ord(c)))
+
+# reunites the list of string into one string and browses it, updating :
+# - prev which contains the last character of binMsg read : '0' or '1'
+# - count which countains the number of consecutive identical characters
+# and printing the result gradually
+prev, count = None, 0
+for c in ''.join(binMsg):
+    if c != prev:
+        print(('0' * count) + \
+        (' ' if count else '') + \
+        (&quot;00 &quot; if c == '0' else &quot;0 &quot;), end='')
+        count = 1
+    else:
+        count+=1
+    prev = c
+print(&quot;0&quot; * count, end=&quot;&quot;)
+            </pre>
+        </div>
+
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+        <a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+       </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

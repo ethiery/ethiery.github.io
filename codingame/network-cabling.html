@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Network Cabling - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Network Cabling - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./stock-exchange-losses.html">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./conway-sequence.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Network Cabling</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle, is to minimize the length of cable used to connect a business park to the network, given the coordinates of all the building. There must be a main horizontal cable, and for each building a dedicated vertical cable from the building to the main cable.</p>
+            <p> If there are A buildings above it and B buildings below it, shifting it up increases the total length of vertical cables by B-A, and shifting it down increases this number by A-B. So to minimize the length:</p>
+            <ul>
+                <li>if there are more buildings below (A < B), the main cable must be shifted down;</li>
+                <li>if there are more buildings above (A > B), the main cable must be shifted up.</li>
+            </ul>
+            <p>Finally, the optimal positions for the main cable are the positions where A = B. That is why, the y-coordinate of the main cable must be a median of the set of y-coordinates of the building.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <p>Once the array <code class="prettyprint">Ys</code> of the y-coordinates of the N buildings, sorted (once again thanks to qsort, but you could use your own sorting function), the median is simply Ys[N/2].</p>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+#include &lt;limits.h&gt;
+
+/* Comparison function between two long long integers
+   return -1 if a&lt;b, 1 if a&gt;b, 0 if a=b */
+int cmp (const void * a, const void * b){
+    long long aa = *(long long*)a;
+    long long bb = *(long long*)b;
+    return aa&lt;bb?-1:aa&gt;bb?1:0;
+}
+
+int main()
+{
+    int N;
+    scanf(&quot;%d&quot;, &amp;N);
+    
+    long long xMin = LLONG_MAX;
+    long long xMax = 0LL;
+    long long x;
+    long long Ys[N];
+    
+    // reading coordinates, storing Ys, computing xMin and xMax
+    for (int i = 0; i &lt; N; i++) {
+        long x;
+        scanf(&quot;%Ld %Ld&quot;, &amp;x, Ys+i);
+        if (x &lt; xMin) xMin = x;
+        if (x &gt; xMax) xMax = x;
+    }
+    // sorting Ys in ascending order
+    qsort(Ys, N, sizeof(long long), cmp);
+    
+    /* The main horizontal cable length is xMax-xMin
+       To minimize the total length of vertical cables, its 
+       y-coordinate of the main cable must be a median of Ys, Ys[N/2]*/
+    long long res = xMax-xMin;
+    for (int i = 0 ; i &lt; N ; i++)
+        res += abs(Ys[N/2]-Ys[i]);
+        
+    printf(&quot;%Ld\n&quot;, res);
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

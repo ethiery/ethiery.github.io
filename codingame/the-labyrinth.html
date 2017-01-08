@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - The Labyrinth - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - The Labyrinth - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./cgx-formatter.html">Previous</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./skynet-the-bridge.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">The Labyrinth
+        </div>
+
+        <div class="container">
+            <p>This puzzle involves maze solving algorithms, but the aim is a little more than just getting out of the maze. First you have to find a certain spot of the maze (the control room) and lead your character there. From the moment he stepped in the control room, you have limited time to get back to the starting point. To make the puzzle more interesting, you only have a local view : 5 cells by 5 around your character.</p>
+            <p>To make sure you will be able to go back from the control room to the starting point in time, you must find a short enough path before stepping in the control room. For this purpose, I implemented a function which performs a Breadth First Search to find the shortest path to a certain spot of the maze (the control room, the starting point, or a not yet explored cell), and leads the character to this spot, or until it is discovered. With this function, the main algorithm is very simple : </p>
+            <ul>
+                <li>while the maze has not been entirely mapped, go to the nearest not yet explored cell ;</li>
+                <li>go to the control room (along the shortest path) ;</li>
+                <li>go back to the starting point, necessarily in time, following the shortest path.</li>
+            </ul>  
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.io.*;
+import java.math.*;
+
+/** Class representing a couple of cartesian coordinates*/
+class Coords {
+    int X, Y;
+    
+    public Coords(int X, int Y){
+        this.X = X;
+        this.Y = Y;
+    }
+    
+    /** returns an array containing the 4 adjacent coordinates to this */
+    public Coords[] neighbours() {
+        Coords res[] = {new Coords(X, Y-1), new Coords(X+1, Y), new Coords(X, Y+1), new Coords(X-1, Y)};
+        return res;
+    }
+
+    public boolean equals(Coords d) {
+        return this.X == d.X &amp;&amp; this.Y == d.Y;
+    }
+}
+
+
+class Player {
+
+    /** height of the labyrinth*/
+    private static int height;
+    /** width of the labyrinth*/
+    private static int width;
+    /** 2-dimensionnal array representing the labyrinth
+     *  map[i][j] is the j-th cell of the i-th column, it can be 
+     *  . : a hollow space
+     *  # : a wall
+     *  T : the starting position of kirk
+     *  C : the control room
+     *  ? : has not been scanned yet
+     */
+    private static char map[][];
+
+    /** coordinates of Kirk*/
+    private static Coords c;
+    /** direction followed by kirk, which can be 1 of the 4 following constants*/
+    private static int direction;
+    private final static int UP = 0;
+    private final static int RIGHT = 1;
+    private final static int DOWN = 2;
+    private final static int LEFT = 3;
+
+    /** the 4 differents outputs possible*/
+    private static final String output[] = {&quot;UP&quot;, &quot;RIGHT&quot;, &quot;DOWN&quot;, &quot;LEFT&quot;};
+
+    private static final Scanner in = new Scanner(System.in);
+
+    /** For code clarity, returns map[s.Y][s.X]*/
+    private static char map(Coords s) {
+        return map[s.Y][s.X];
+    }
+
+    /** For code clarity, returns true if and only if s is in the map*/
+    private static boolean isInMap(Coords s) {
+        return 0 &lt;= s.X &amp;&amp; s.X &lt; width &amp;&amp; 0 &lt;= s.Y &amp;&amp; s.Y &lt; height;
+    }
+
+    /** Returns true if and only if map(s) is one of the chars of 'avoid'*/
+    private static boolean mustBeAvoided(Coords s, char[] avoid) {
+        for (char ch : avoid)
+            if (map(s) == ch)
+                return true;
+        return false;
+    }
+
+    /** Reads input for one game turn, updates kirk's coordinates,
+     * and the part of the map newly discovered*/
+    public static void readNewInfo() {
+            c.Y = in.nextInt();
+            c.X = in.nextInt();
+            
+            for (int y = 0; y &lt; height; y++) {
+                String ROW = in.next();
+                if (c.Y-2 &lt;= y &amp;&amp; y &lt;= c.Y+2)
+                    for (int x = Math.max(c.X-2, 0); x &lt; Math.min(c.X+3, width); x++)
+                        map[y][x] = ROW.charAt(x);
+            }
+
+            for (int y = 0; y &lt; height; y++) {
+                for (int x = 0; x &lt; width; x++) {
+                    System.err.print(map[y][x]);
+                }
+                System.err.print(&quot;\n&quot;);
+            }
+    }
+    
+    /** Computes the shortest path from Kirk to a cell containing char 'target',
+     * while avoiding characters contained by 'toAvoid'.
+     * If onlyReveal is true, walks this path until the target cell is revealed (ie != '?')
+     * Else, goes to the target cell.
+     * @return false if no cell containing char 'target' can be found, true else.*/
+    public static boolean goTo(char target, char[] toAvoid, boolean onlyReveal) {
+        // initializes an array to remember predecessors during BFS
+        int prec[][] = new int[height][width];
+        for (int y = 0; y &lt; height; y++)
+            for (int x = 0; x &lt; width; x++)
+                prec[y][x] = -1;
+            
+        // initializes a queue to perform a BFS
+        LinkedList&lt;Coords&gt; queue = new LinkedList&lt;Coords&gt;();
+        queue.add(c);
+        // perform a BFS, avoid characters contained by 'toAvoid', 
+        // until character 'target is found'
+        while(queue.size() &gt; 0 &amp;&amp; map(queue.element()) != target) {
+            Coords[] neighbours = queue.remove().neighbours();
+            for (int i = 0; i &lt; neighbours.length; i++) {
+                Coords n = neighbours[i];
+                if (isInMap(n) &amp;&amp; !mustBeAvoided(n, toAvoid) &amp;&amp; prec[n.Y][n.X] == -1) {
+                    prec[n.Y][n.X] = (i+2) % 4;
+                    queue.add(n);
+                }
+            }
+        }
+    
+        /* at this point, if queue is empty, no char 'target' is reachable 
+        else, queue.element() is a target and path from Kirk to q.element() is generated
+        by reading precursors*/
+
+        if (queue.size() == 0)
+            return false;
+        else {
+            Coords targetCell = queue.remove();
+            Stack&lt;Integer&gt; path = new Stack&lt;Integer&gt;();
+            Coords iter = targetCell;
+            while (!iter.equals(c)) {
+                path.push((prec[iter.Y][iter.X]+2) % 4);
+                iter = iter.neighbours()[prec[iter.Y][iter.X]];  
+            }
+                
+            // If we just want to reveal the target, we stop when it is
+            // else we stop when Kirk is on it
+            while ((onlyReveal &amp;&amp; map(targetCell) == target) ||
+                   (!onlyReveal &amp;&amp; !path.empty())) { 
+                System.out.println(output[path.pop()]);
+                readNewInfo();
+            }
+            return true;
+        }
+    }
+
+    public static void main(String args[]) {        
+        height = in.nextInt();
+        width = in.nextInt();
+        direction = UP;
+        c = new Coords(-1,-1);
+        int A = in.nextInt();
+
+        // Initializing the map
+        map = new char[height][width];
+        for (int y = 0; y &lt; height; y++)
+            for (int x = 0; x &lt; width; x++)
+                map[y][x] = '?';
+        
+        readNewInfo();
+
+        // discovers the entire map
+        char[] avoidWallsAndControl = { '#', 'C' };
+        while (goTo('?', avoidWallsAndControl, true));
+
+        // goes to control room and goes back to start
+        char avoidWalls[] = { '#', '?' };
+        goTo('C', avoidWalls, false);
+        goTo('T', avoidWalls, false);
+    }
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

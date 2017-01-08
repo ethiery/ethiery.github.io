@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Teads Sponsored Challenge - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Teads Sponsored Challenge - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./apu-init-phase.html">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./mars-lander-2.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Teads Sponsored Challenge</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>Interesting puzzle ! The aim is more or less to find the best person to start spreading propagation of a message in a crowd of people. For this to be clearer let us introduce a little vocabulary :</p>
+            <ul>
+                <li>The <b>eccentricity</b> of a vertex is the greatest distance between this vertex and any other vertex.</li>
+                <li>The <b>radius</b> of a graph is the minimum eccentricity of any vertex, or the smallest distance at which can be one vertex from all the others.</li>
+                <li>The <b>diameter</b> of a graph is the maximum eccentricity of any vertex, or the greatest distance between any pair of vertices.</li>
+                <li>The <b>center</b> of a graph is the set of vertices of eccentricity equal to the radius (here the best person to start spreading the message).</li>
+            </ul>
+            <p>In pratice, given a connected graph we want to compute its radius. Now, this puzzle is easiest as it seems, because we work not on all graphs, but only on <b>undirected trees</b>. Hence, we can rely on several properties.</p>
+            <p>First, there is only one simple path between 2 vertices of an undirected tree. As a consequence, the radius and diameter of such a tree are linked by the following relationship : <b>2R - 1 <= D <= 2R</b>. So instead of computing the radius, we can compute the diameter.</p>
+            <p>Moreover, any node can be the root of an undirected tree. It is useful to <a href="http://cs.stackexchange.com/questions/22855/algorithm-to-find-diameter-of-a-tree-using-bfs-dfs-why-does-it-work">prove</a> the correction of <b>an algorithm used to compute the diameter of an undirected tree in linear time</b>. The algorithm is the following.</p>
+            <ul>
+                <li>From any vertex s, find u one of the most distant vertex to s, by running a breadth first search. u is the node discovered last.</li>
+                <li>Then run another BFS from u. If v is the vertex discovered last, then the distance between u and v is the diameter of the tree.</li>
+            </ul>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.math.*;
+
+/**
+ * This class is used to return both the last vertex encoutered, 
+ * and the excentricity of the starting vertex after a BFS
+ */
+class Result { 
+    public int length; 
+    public Node last; 
+}
+
+/**
+ * This class is representing a node of the graph.
+ * neighbs is a list of the node neighbours
+ * n is a unique constant id
+ */
+class Node {
+    private ArrayList&lt;Node&gt; neighbs;
+    private int n;
+    
+    public Node(int n){
+        this.n = n;
+        neighbs = new ArrayList&lt;Node&gt;();
+    }
+    
+    public void add(Node n){
+        neighbs.add(n);
+    }
+
+    public ArrayList&lt;Node&gt; neighbs(){
+        return neighbs;
+    }
+    
+    public int n(){
+        return n;
+    }
+}
+
+class Solution {
+    /**
+     * Reads the standard input and constructs the graph to study
+     * @return ArrayList of the vertices of the graph
+     */
+    public static ArrayList&lt;Node&gt; readInfos()
+    {
+        Scanner in = new Scanner(System.in);
+        ArrayList&lt;Node&gt; graph = new ArrayList&lt;Node&gt;();
+        int N, x, y;
+        
+        N = in.nextInt();
+        for (int i = 0; i &lt; N; i++) {
+            x = in.nextInt();
+            y = in.nextInt();
+            /*As node ids are consecutive and start from 0, when discovering a
+             new node i, adds nodes to the graph until there are i+1 nodes */
+            while(graph.size() &lt;= Math.max(x,y))
+                graph.add(new Node(graph.size()));
+            graph.get(x).add(graph.get(y));
+            graph.get(y).add(graph.get(x));
+        }
+        
+        return graph;
+    }
+    
+    /**
+     * Runs a Breadth First Search and returns the last node encountered, 
+     * and the starting node excentricity
+     * Complexity : O(|V|)
+     * @param start starting vertex
+     * @param graph graph to search
+     * @return Result containing one of the most distant nodes from 'start', 
+     * and the distance between them*/
+    public static Result BFS (Node start, ArrayList&lt;Node&gt; graph)
+    {
+        Result res = new Result();
+        
+        int[] depth = new int[graph.size()];
+        for (int i = 0 ; i &lt; graph.size() ; i++)
+            depth[i]=-1;
+        depth[start.n()] = 0;
+        
+        Stack&lt;Node&gt; stack = new Stack&lt;Node&gt;();
+        stack.push(start);
+        
+        Node father, son;
+        while (!stack.empty()) {
+            father = stack.pop();
+            Iterator&lt;Node&gt; sons = father.neighbs().iterator();
+            while (sons.hasNext()) {
+                son = sons.next();
+                if (depth[son.n()] == -1) {
+                    depth[son.n()] = depth[father.n()]+1;
+                    if (depth[son.n()] &gt; res.length) {
+                        res.length = depth[son.n()];
+                        res.last = son;
+                    }
+                    stack.push(son);
+                }
+            }
+        }
+        return res;       
+    }
+
+    public static void main(String args[]) 
+    {
+        ArrayList&lt;Node&gt; graph = readInfos();
+        Result r = BFS(graph.get(0), graph);
+        r = BFS(r.last, graph);
+        System.out.println((r.length+1)/2);
+    }
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

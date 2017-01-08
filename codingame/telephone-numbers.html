@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Telephone Numbers- solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Telephone Numbers- solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">	
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./conway-sequence.html">Previous</a>	      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./dwarfs-on-giants.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Telephone Numbers</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle, is to build a <a href="https://en.wikipedia.org/wiki/Radix_tree">radix tree</a> or PATRICIA tree, to represent a set of telephone numbers. Once the data structure declared, you just have to go along the branch of the tree corresponding to each new number, adding missing nodes.</p>
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;string.h&gt;
+
+struct item {    
+    int digit;
+    int nbChildren;
+    struct item* children[10];
+};
+
+// Returns a new item which has the digit 'd'
+struct item *newItem(int d)
+{
+    struct item *it = malloc(sizeof(*it));
+    it-&gt;digit = d;
+    it-&gt;nbChildren = 0;
+    return it;
+}
+
+// If it exits, returns a pointer toward the child of item 'f'
+// which has the digit 'digit', else returns NULL 
+struct item *getChild(struct item *f, int d) 
+{
+    for (int i = 0; i &lt; f-&gt;nbChildren ;i++)
+        if (f-&gt;children[i]-&gt;digit == d)
+            return f-&gt;children[i];
+    return NULL;
+}
+
+// Add a child which has the digit 'digit' to item 'father'
+void addChild(struct item *f, int d)
+{
+    struct item *child = newItem(d);
+    f-&gt;children[f-&gt;nbChildren] = child;
+    f-&gt;nbChildren++;
+}
+
+// Frees an item and its children recursively
+void freeItem(struct item *it) 
+{
+    for (int i = 0; i &lt; it-&gt;nbChildren; i++)
+        free(it-&gt;children[i]);
+    free(it);
+}
+
+int main(int argc, char **argv)
+{
+    int N;
+    scanf(&quot;%d\n&quot;, &amp;N);
+
+    int result = 0;
+    struct item *root = newItem(-1);
+    
+    for (int i = 0; i &lt; N; i++) {
+        int c;
+        struct item *current = root;
+        
+        /* Reads through the telephone number, moving along the corresponding
+           branches of the tree and adding nodes if needed*/
+        while ((c = getchar()) != '\n' &amp;&amp; c != EOF) {
+            if (getChild(current, c-'0') == NULL) {
+                addChild(current, c-'0');
+                result++;
+            }
+            current = getChild(current, c-'0');
+        }
+    }
+    free(root);
+    printf(&quot;%d\n&quot;, result);
+    return EXIT_SUCCESS;
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

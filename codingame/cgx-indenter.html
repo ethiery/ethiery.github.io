@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - CGX indenter - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - CGX Indenter - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+		<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right">		      
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./cgx-indenter.html">Previous</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">CGX Indenter</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+            <p>The aim of this puzzle is to create a formatter for a new text data format. The first step is to understand what the different element types are, and the rules of formatting. There are two things which are not clear in the statement according to me :</p>
+            <ul>
+                <li>There can be spaces in the original CGX content almost everywhere : before and after parenthesis, semicolons, and equal signs.</li>
+                <li>Everywhere a space can be, you can also encounter TABULATION ('\t') ! I had a hard time figuring this, as you can pass all the test cases without handling tabulations, but not final tests.</li>
+            </ul>  
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <p>There are certainly many ways to solve this puzzle, so my solution is only an exemple. I never studied parsers or lexers, so my approche is probably quite "naive", and lacks efficiency. But it gives a cool example of inheritance / polymorphism, very important concepts of OOP.</p>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.io.*;
+import java.math.*;
+
+/** This class represents an element, which can be read from CGX content
+ * and printed as a well formatted String
+ */
+abstract class Element {
+
+    /** modifies the representation of an element, indenting it by 'indentLevel' spaces */
+    public static String indent(String toIndent, int indentLevel) {
+        // Creates the indentation block
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i &lt; indentLevel; i++)
+            sb.append(&quot; &quot;);
+        String indentation = sb.toString();
+
+        // Adds it in front of each line 
+        return indentation+toIndent.replace(&quot;\n&quot;, &quot;\n&quot;+indentation);
+    }
+
+    /** returns an int describing the type of the element beginning by content[offset]
+     * type 1 : block    type 2 : primitive type    type 3 : key value
+     * type 0 : none of the 3, probably a tabulation or a space
+     */
+    public static int type(String content, int offset) {
+        if (isBlock(content, offset))
+            return 1;
+        else if (isKeyValue(content, offset))
+            return 3;
+        else if (isPrimitive(content, offset))
+            return 2;
+        else
+            return 0;
+    }
+
+    /** reads next element of content and return new offset
+     * for each type, should work only if content[offset] is really
+     * the beginning of the given type.
+     */
+    abstract int read(String content, int offset);
+
+    /** returns a representation of the element, following the formatting
+     * rules given in the puzzle
+     */
+    abstract String toFormattedCGX();
+
+
+    // private functions used to identify each type
+
+    /** returns true if and only if next Element in content is a Block */
+    private static boolean isBlock(String content, int offset) {
+        return content.charAt(offset) == '(';
+    }
+
+    /** returns true if next Element in content is a Primitive type
+     * be careful, also returns true if it is a KeyValue, so check with isKeyValue
+     * returns false if it is not a Primitive or KeyValue
+     */
+    private static boolean isPrimitive(String content, int offset) {
+        return Character.isDigit(content.charAt(offset)) ||
+        content.regionMatches(offset, &quot;true&quot;, 0, 4) ||
+        content.regionMatches(offset, &quot;false&quot;, 0, 5) ||
+        content.regionMatches(offset, &quot;null&quot;, 0, 4) ||
+        content.charAt(offset) == '\'';
+    }
+
+    /** returns true if and only if next Element in content is a KeyValue */
+    private static boolean isKeyValue(String content, int offset) {
+        if (content.charAt(offset) != '\'')
+            return false;
+        else {
+            while (content.charAt(++offset) != '\'');
+            ++offset;
+            while (offset &lt; content.length() &amp;&amp; 
+                   (content.charAt(offset) == ' ' || content.charAt(offset) == '\t'))
+                ++offset;
+            return (offset &lt; content.length() &amp;&amp; content.charAt(offset) == '=');
+        }
+    }
+}
+
+class Block extends Element {
+    private ArrayList&lt;Element&gt; elements;
+    private static final int INDENT_LEVEL = 4;
+
+    public Block() {
+        elements = new ArrayList&lt;Element&gt;();
+    }
+
+    public int read(String content, int offset) {
+        // skips opening parenthesis
+        offset++;
+        // read each item :
+        while (content.charAt(offset) != ')') {
+            // skips optionnal ' ', tabulations and ';'
+            while (content.charAt(offset) == ' ' || 
+                   content.charAt(offset) == '\t' || 
+                   content.charAt(offset) == ';')
+                offset++;
+
+            // if there is at least one item left
+            if (content.charAt(offset) != ')') {
+                Element nextElement = null;
+                switch (Element.type(content, offset)) {
+                    case 1 :
+                        nextElement = new Block();
+                        break;
+                    case 2 :
+                        nextElement = new Primitive();
+                        break;
+                    case 3 :
+                        nextElement = new KeyValue();
+                        break;
+                }
+                offset = nextElement.read(content, offset);
+                elements.add(nextElement);
+            }
+        }
+        // skip closing parenthesis and return new offset
+        return ++offset;
+    }
+
+    public String toFormattedCGX() {
+        StringBuilder result = new StringBuilder();
+        result.append(&quot;(\n&quot;);
+        
+        if (elements.size() &gt; 0) {
+            for (Element e : elements) {
+                result.append(indent(e.toFormattedCGX(), INDENT_LEVEL));
+                result.append(&quot;;\n&quot;);
+            }
+            // remove last ';' and add closing parenthesis
+            result.deleteCharAt(result.length()-2);
+        }
+
+        result.append(&quot;)&quot;);
+        return result.toString();
+    }
+} 
+
+class Primitive extends Element {
+
+    /** string representing the primitive :
+     * true, false, null, a number, a string (with quotes)*/
+    private String value;
+
+    public Primitive() {}
+
+    public int read(String content, int offset) {
+        /* sets i so that content[offset+i] is the 1st char after the primitive
+           using the fact that for a string it follows ', for a number it is the  
+           is 1st non digital char, and for others it is the first non lower case */ 
+        int i = 0;
+        
+        if (content.charAt(offset) == '\'') {
+            ++i;
+            while (offset+i &lt; content.length() &amp;&amp; content.charAt(offset+i) != '\'')
+                ++i;
+            ++i;
+        } 
+        else if (Character.isDigit(content.charAt(offset)))
+            while (offset+i &lt; content.length() &amp;&amp; Character.isDigit(content.charAt(offset+i)))
+                i++;
+        else
+            while (offset+i &lt; content.length() &amp;&amp; Character.isLowerCase(content.charAt(offset+i)))
+                i++;
+
+        value = content.substring(offset, offset+i);
+        return offset+i;
+    }
+
+    public String toFormattedCGX() {
+        return value;
+    }
+}
+
+class KeyValue extends Element {
+    // key, stored as a Primitive string
+    private Primitive key;
+    // value, which can be a block or a Primitive
+    private Element value;
+
+    public KeyValue() {
+        key = new Primitive();
+    }
+
+    public int read(String content, int offset) {
+        offset = key.read(content, offset);
+        // skips '=', and optionnal spaces
+        while (Element.type(content, offset) == 0)
+            offset++;
+        switch (Element.type(content, offset)) {
+            case 1 :
+                value = new Block();
+                break;
+            case 2 :
+                value = new Primitive();
+                break;
+        }
+        offset = value.read(content, offset);
+        return offset;
+    }
+
+    public String toFormattedCGX() {
+        StringBuilder result = new StringBuilder();
+        result.append(key.toFormattedCGX());
+        result.append(&quot;=&quot;);
+        if (value instanceof Block)
+            result.append(&quot;\n&quot;);
+        result.append(value.toFormattedCGX());
+        return result.toString();
+    }
+}
+
+class Solution {
+
+    private static String content;
+    private static int offset = 0;
+    
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+
+        // Reading CGX content
+        int N = in.nextInt();
+        in.nextLine();
+        StringBuilder CGXlines = new StringBuilder(); 
+        for (int i = 0; i &lt; N; i++) 
+            CGXlines.append(in.nextLine());
+        content = CGXlines.toString();
+        // For each element, reads it, formats it and prints it
+        while (offset &lt; content.length()) {
+            Element nextElement = null;
+            switch (Element.type(content, offset)) {
+                case 1 :
+                    nextElement = new Block();
+                    break;
+                case 2 :
+                    nextElement = new Primitive();
+                    break;
+                case 3 :
+                    nextElement = new KeyValue();
+                    break;
+            }
+            if (nextElement == null)
+                offset++;
+            else {
+                offset = nextElement.read(content, offset);
+                System.out.println(nextElement.toFormattedCGX());
+            }
+        }   
+    }
+}
+            </pre>
+        </div>
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+		<a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+	   </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>

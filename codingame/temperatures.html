@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="CodinGame solo puzzle - Temperatures - solved by Etienne THIERY">
+    <meta name="author" content="Etienne THIERY">
+
+    <title>CodinGame solo puzzle - Temperatures - solved by Etienne THIERY</title>
+
+    <!-- Bootstrap Core CSS -->
+    <link rel="stylesheet" href="../css/bootstrap.min.css" type="text/css">
+
+    <!-- Custom Fonts -->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
+    <link href='http://fonts.googleapis.com/css?family=Merriweather:400,300,300italic,400italic,700,700italic,900,900italic' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../font-awesome/css/font-awesome.min.css" type="text/css">
+
+    <!-- Plugin CSS -->
+    <link rel="stylesheet" href="../css/animate.min.css" type="text/css">
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../css/creative.css" type="text/css">
+
+    <!-- Prettify js -->
+    <script src="https://google-code-prettify.googlecode.com/svn/loader/run_prettify.js?skin=doxy"></script>
+    <style>
+        .prettyprint ol.linenums > li { list-style-type: decimal; }
+    </style> 
+    
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+        <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+        <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
+
+</head>
+
+<body id="page-top">
+
+    <nav id="mainNav" class="navbar navbar-default navbar-fixed-top">
+        <div class="container-fluid">
+            <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand page-scroll" style="color: #222" href="../index.html#page-top">cd ~</a>
+            </div>
+
+            <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+                <ul class="nav navbar-nav navbar-right"> 
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./the-descent.html">Previous</a>
+                    </li>             
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./all.html">cd ..</a>
+                    </li>
+                    <li>
+                        <a class="page-scroll" style="color: #777" href="./chuck-norris.html">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <section id="onlyone">
+        <div class="container">
+            <h2 class="text-center">Temperatures</h2>
+            <hr>
+        </div>
+
+        <div class="container">
+          <p> The aim of this puzzle is to find the closest temperature to 0 in a list. It is pretty easy, and perfect to introduce a very commun and fundamental algorithm : the linear search.
+        </div>
+
+        <div class="container text-left">
+            <h2>C</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+#include &lt;stdlib.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;math.h&gt;
+#include &lt;limits.h&gt;
+// limits.h contains the macro INT_MAX which is the maximum capacity of an int
+
+int main(int argc, char** argv)
+{
+    int N;
+    scanf(&quot;%d\n&quot;, &amp;N);
+
+    if (N == 0)
+        printf(&quot;0&quot;);
+    else {
+        char str[10000];
+        fgets(str,10000,stdin);
+        char *iter = str;
+
+        int T, len, min=INT_MAX;
+        /* Search the temperature of minimum absolute valueReads
+        Note a subtilty of the exercice : a temperature T&gt;0 is prefered over -T*/
+        while (sscanf(iter, &quot;%d%n&quot;, &amp;T, &amp;len) == 1) {
+          if (abs(T) &lt; abs(min) || (T == -min &amp;&amp; T &gt; 0))
+              min = T;
+          iter+=len;
+        }
+
+        printf(&quot;%d&quot;, min);
+    }
+    return EXIT_SUCCESS;
+    /* sscanf takes a char* pointer on the string to read
+       %d means an integer is expected
+       %n means the nb of characters consumed is stored in len
+       which is then used to move forward in str
+       sscanf returns the number of item read (here 1 or in the end 0)*/
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Java</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+import java.util.*;
+import java.math.*;
+
+class Solution {
+    public static void main(String args[]) {
+        Scanner in = new Scanner(System.in);
+        
+        int N = in.nextInt();
+        if (N == 0)
+            System.out.println(&quot;0&quot;);
+        else {
+            int T;
+            int min = Integer.MAX_VALUE;
+            /* Search the temperature of minimum absolute valueReads
+               Note a subtilty of the exercice : a temperature T&gt;0 is prefered over -T */
+            for (int i = 0; i &lt; N; i++) {
+                T = in.nextInt();
+                if (Math.abs(T) &lt; Math.abs(min) || (T == -min &amp;&amp; T &gt; 0))
+                    min = T;
+            }
+            System.out.println(min);
+        }
+    }
+}
+            </pre>
+        </div>
+
+        <div class="container text-left">
+            <h2>Python 3</h2>
+            <div class="divider-grey"></div>
+            <pre class="prettyprint linenums">
+N = int(input())
+if N == 0:
+    print(&quot;0&quot;)
+else:
+    min = None
+    for T in map(int, input().split()):
+        if (min == None) or (abs(T) &lt; abs(min)) or ((T == -min) and (T &gt; 0)):
+            min = T
+    print(min)
+            </pre>
+        </div>
+
+    </section>
+
+    <aside class="bg-dark">
+        <div class="container text-center">
+        <a href="mailto:etienne.thiery@enseirb-matmeca.fr">Contact</a>        
+       </div>
+    </aside>
+
+    <!-- jQuery -->
+    <script src="../js/jquery.js"></script>
+
+    <!-- Bootstrap Core JavaScript -->
+    <script src="../js/bootstrap.min.js"></script>
+
+    <!-- Plugin JavaScript -->
+    <script src="../js/jquery.easing.min.js"></script>
+    <script src="../js/jquery.fittext.js"></script>
+    <script src="../js/wow.min.js"></script>
+
+    <!-- Custom Theme JavaScript -->
+    <script src="../js/creative.js"></script>
+
+</body>
+
+</html>
